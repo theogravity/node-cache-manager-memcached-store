@@ -17,7 +17,7 @@ Some of the project scaffolding and test/comments are lifted from [node-cache-ma
 
 ```js
 var cacheManager = require('cache-manager')
-var memcachedStore = require('cache-manager-memcached')
+var memcachedStore = require('cache-manager-memcached-store')
 
 var memcachedCache = cacheManager.caching({
     store: memcachedStore,
