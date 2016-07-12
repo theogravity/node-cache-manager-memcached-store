@@ -7,7 +7,7 @@ The Memcached store for the [node-cache-manager](https://github.com/BryanDonovan
 ### Installation
 
 ```sh
-npm i cache-manager-memcached --save
+npm i cache-manager-memcached-store --save
 ```
 ### Acknowledgements
 
