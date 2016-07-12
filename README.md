@@ -1,6 +1,6 @@
 # Node Cache Manager store for Memcached
  
-[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](http://standardjs.com) [![Build Status](https://travis-ci.org/theogravity/node-cache-manager-memcached.svg?branch=master)](https://travis-ci.org/theogravity/node-cache-manager-memcached)
+[![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](http://standardjs.com) [![Build Status](https://travis-ci.org/theogravity/node-cache-manager-memcached.svg?branch=master)](https://travis-ci.org/theogravity/node-cache-manager-memcached) [![npm version](https://badge.fury.io/js/cache-manager-memcached-store.svg)](https://badge.fury.io/js/cache-manager-memcached-store)
 
 The Memcached store for the [node-cache-manager](https://github.com/BryanDonovan/node-cache-manager) module.
 
