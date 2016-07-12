@@ -1,5 +1,5 @@
 {
-  "name": "cache-manager-memcached",
+  "name": "cache-manager-memcached-store",
   "version": "1.0.0",
   "description": "memcached impl for cache-manager",
   "main": "index.js",
