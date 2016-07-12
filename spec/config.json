@@ -1,0 +1,7 @@
+{
+    "memcached": {
+        "host": "localhost",
+        "port": 11211,
+        "maxExpiration": 30
+    }
+}

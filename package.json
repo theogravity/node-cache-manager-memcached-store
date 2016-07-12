@@ -1,0 +1,32 @@
+{
+  "name": "cache-manager-memcached",
+  "version": "1.0.0",
+  "description": "memcached impl for cache-manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "jasmine && standard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theogravity/node-cache-manager-memcached.git"
+  },
+  "keywords": [
+    "cache",
+    "memcached",
+    "cache-manager"
+  ],
+  "author": "Theo Gravity <theo@suteki.nu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theogravity/node-cache-manager-memcached/issues"
+  },
+  "homepage": "https://github.com/theogravity/node-cache-manager-memcached#readme",
+  "devDependencies": {
+    "cache-manager": "2.1.2",
+    "jasmine": "2.4.1",
+    "standard": "7.1.2"
+  },
+  "dependencies": {
+    "memcached": "2.2.2"
+  }
+}

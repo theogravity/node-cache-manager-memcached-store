@@ -1,0 +1,15 @@
+language: node_js
+node_js:
+  - "iojs"
+
+# Create a Travis memcached enabled environment for the test suite to run in and
+# ensure that we test against localhost on Travis-CI.
+services: memcache
+env: MEMCACHED__HOST=localhost
+
+# The `sevices: memcache` will start a memcached service on localhost
+# and on the default port, but in order to test against multiple memcached
+# instances we need to spawn a couple more, so we do that during the before
+# script
+before_script:
+  - memcached -p 11212 -d
