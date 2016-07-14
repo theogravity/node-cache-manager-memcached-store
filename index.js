@@ -83,6 +83,8 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
     opt = {
       ttl: options
     }
+  } else if (typeof options === 'object') {
+    opt = options
   }
 
   this.memcached.set(key, value, opt.ttl, handleError(cb))
