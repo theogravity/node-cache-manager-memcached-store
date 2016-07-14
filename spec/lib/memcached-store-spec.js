@@ -129,6 +129,23 @@ describe('reset', function () {
   })
 })
 
+describe('keys', function () {
+  it('should get all the keys', function (done) {
+    memcachedCache.reset(function (err) {
+      expect(err).toBe(null)
+
+      memcachedCache.set('foo', 'bar', function () {
+        memcachedCache.keys(function (err, keys) {
+          expect(err).toBe(null)
+          console.log(keys)
+          expect(keys.length).toBe(1)
+          done()
+        })
+      })
+    })
+  })
+})
+
 describe('isCacheableValue', function () {
   it('should return true when the value is not null or undefined', function (done) {
     expect(memcachedCache.store.isCacheableValue(0)).toBe(true)

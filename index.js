@@ -142,6 +142,20 @@ MemcachedClient.prototype.getClient = function (cb) {
   })
 }
 
+/**
+ * Returns all keys. Warning: Potentially very expensive function as memcache does not have a simple way to get key data.
+ * @method keys
+ * @param {String} [pattern] - Has no use, retained for interface compat.
+ * @param {Function} cb - A callback that returns a potential error and the response
+ */
+MemcachedClient.prototype.keys = function (pattern, cb) {
+  if (typeof pattern === 'function') {
+    cb = pattern
+  }
+
+  getKeys(this.memcached, handleError(cb))
+}
+
 module.exports = {
   create: function (args) {
     return new MemcachedClient(args)
@@ -158,4 +172,52 @@ function handleError (cb) {
 
     return cb(err, resp)
   }
+}
+
+// from: http://blog.pointerstack.com/2012/08/nodejs-extract-keys-from-memcache-server.html
+function getKeys (memcached, cb) {
+  memcached.items(function (err, result) {
+    var keyArray = []
+
+    if (err) {
+      return cb(err)
+    }
+
+    // for each server...
+    result.forEach(function (itemSet) {
+      var keys = Object.keys(itemSet)
+      // we don't need the "server" key, but the other indicate the slab id's
+      keys.pop()
+
+      // Here get key item's length
+      var keysLength = keys.length
+
+      keys.forEach(function (stats) {
+        // get a cachedump for each slabid and slab.number
+        memcached.cachedump(itemSet.server, parseInt(stats, 10),
+          parseInt(itemSet[stats].number, 10), function (err, response) {
+            if (err) {
+              return cb(err)
+            }
+
+            // memcached.end()
+            // dump the shizzle
+            if (typeof response.key === 'undefined' && response.length > 1) {
+              response.forEach(function (keyObj) {
+                keyArray.push(keyObj.key)
+              })
+            } else {
+              keyArray.push(response.key)
+            }
+
+            keysLength--
+
+            if (keysLength === 0) {
+              cb(null, keyArray)
+            }
+          }
+        )
+      })
+    })
+  })
 }
