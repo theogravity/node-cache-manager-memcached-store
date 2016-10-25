@@ -1,44 +1,13 @@
-var Memcached = require('memcached')
-var EventEmitter = require('events').EventEmitter
+var Memcached = require('memcache-plus')
 
-function MemcachedClient (args) {
-  this.options = args || {}
-  var servers = null
+function MemcachedClient (options) {
+  this.options = options
 
-  if (args.host && args.port) {
-    servers = args.host + ':' + args.port
-  } else if (args.servers) {
-    servers = args.servers
-  } else {
-    throw new Error('[cache-manager] Memcache connection not defined')
+  if (!this.options) {
+    throw new Error('[cache-manager] memcache options not defined')
   }
 
-  this.memcached = new Memcached(servers, this.options.memcached)
-  this._initMemcachedEvents()
-}
-
-MemcachedClient.prototype.events = new EventEmitter()
-
-MemcachedClient.prototype._initMemcachedEvents = function () {
-  this.memcached.on('issue', function (details) {
-    this.events.emit('memcachedIssue', details)
-  }.bind(this))
-
-  this.memcached.on('failure', function (details) {
-    this.events.emit('memcachedFailure', details)
-  }.bind(this))
-
-  this.memcached.on('reconnecting', function (details) {
-    this.events.emit('memcachedReconnecting', details)
-  }.bind(this))
-
-  this.memcached.on('reconnect', function (details) {
-    this.events.emit('memcachedReconnect', details)
-  }.bind(this))
-
-  this.memcached.on('remove', function (details) {
-    this.events.emit('memcachedRemove', details)
-  }.bind(this))
+  this.memcached = new Memcached(this.options.memcached)
 }
 
 MemcachedClient.prototype.name = 'memcached'
@@ -58,9 +27,19 @@ MemcachedClient.prototype.name = 'memcached'
 MemcachedClient.prototype.get = function (key, options, cb) {
   if (typeof options === 'function') {
     cb = options
-  }
 
-  this.memcached.get(key, handleError(cb))
+    this.memcached.get(key).then(function (value) {
+      cb(null, value)
+    }).catch(function (err) {
+      cb(err, null)
+    })
+  } else {
+    this.memcached.get(key, options).then(function (value) {
+      cb(null, value)
+    }).catch(function (err) {
+      cb(err, null)
+    })
+  }
 }
 
 /**
@@ -79,15 +58,29 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
 
   if (typeof options === 'function') {
     cb = options
+
+    this.memcached.set(key, value).then(function () {
+      cb(null, true)
+    }).catch(function (err) {
+      cb(err, null)
+    })
   } else if (typeof options === 'number') {
     opt = {
       ttl: options
     }
-  } else if (typeof options === 'object') {
-    opt = options
-  }
 
-  this.memcached.set(key, value, opt.ttl, handleError(cb))
+    this.memcached.set(key, value, opt.ttl).then(function () {
+      cb(null, true)
+    }).catch(function (err) {
+      cb(err, null)
+    })
+  } else if (typeof options === 'object') {
+    this.memcached.set(key, value, options).then(function () {
+      cb(null, true)
+    }).catch(function (err) {
+      cb(err, null)
+    })
+  }
 }
 
 /**
@@ -100,9 +93,15 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
 MemcachedClient.prototype.del = function (key, options, cb) {
   if (typeof options === 'function') {
     cb = options
+  } else if (!options) {
+    cb = function () {}
   }
 
-  this.memcached.del(key, handleError(cb))
+  this.memcached.delete(key).then(function () {
+    cb(null, null)
+  }).catch(function (err) {
+    cb(err, null)
+  })
 }
 
 /**
@@ -111,7 +110,15 @@ MemcachedClient.prototype.del = function (key, options, cb) {
  * @param {Function} [cb] - A callback that returns a potential error, otherwise null
  */
 MemcachedClient.prototype.reset = function (cb) {
-  this.memcached.flush(handleError(cb))
+  if (typeof cb !== 'function') {
+    cb = function () {}
+  }
+
+  this.memcached.flush().then(function () {
+    cb(null)
+  }).catch(function (err) {
+    cb(err, null)
+  })
 }
 
 /**
@@ -176,48 +183,32 @@ function handleError (cb) {
 
 // from: http://blog.pointerstack.com/2012/08/nodejs-extract-keys-from-memcache-server.html
 function getKeys (memcached, cb) {
-  memcached.items(function (err, result) {
-    var keyArray = []
+  var keyArray = []
+  var keyLength = 0
 
-    if (err) {
-      return cb(err)
-    }
+  memcached.items().then(function (items) {
+    items.forEach(function (item) {
+      keyLength += item.data.number
 
-    // for each server...
-    result.forEach(function (itemSet) {
-      var keys = Object.keys(itemSet)
-      // we don't need the "server" key, but the other indicate the slab id's
-      keys.pop()
+      memcached.cachedump(item.slab_id, item.data.number).then(function (dataSet) {
+        dataSet.forEach(function (data) {
+          if (data.key) {
+            memcached.get(data.key).then(function (val) {
+              if (val) {
+                keyArray.push(data.key)
+              }
 
-      // Here get key item's length
-      var keysLength = keys.length
+              keyLength -= 1
 
-      keys.forEach(function (stats) {
-        // get a cachedump for each slabid and slab.number
-        memcached.cachedump(itemSet.server, parseInt(stats, 10),
-          parseInt(itemSet[stats].number, 10), function (err, response) {
-            if (err) {
-              return cb(err)
-            }
-
-            // memcached.end()
-            // dump the shizzle
-            if (typeof response.key === 'undefined' && response.length > 1) {
-              response.forEach(function (keyObj) {
-                keyArray.push(keyObj.key)
-              })
-            } else {
-              keyArray.push(response.key)
-            }
-
-            keysLength--
-
-            if (keysLength === 0) {
-              cb(null, keyArray)
-            }
+              if (keyLength === 0) {
+                cb(null, keyArray)
+              }
+            })
           }
-        )
+        })
       })
     })
+  }).catch(function (err) {
+    cb(err)
   })
 }

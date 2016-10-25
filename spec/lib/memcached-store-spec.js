@@ -8,8 +8,9 @@ var memcachedCache
 beforeAll(function () {
   memcachedCache = require('cache-manager').caching({
     store: memcachedStore,
-    host: process.env.MEMCACHED__HOST || config.memcached.host,
-    port: config.memcached.port
+    options: {
+      hosts: process.env.MEMCACHED__HOST || config.memcached.host + ':' + config.memcached.port
+    }
   })
 })
 
@@ -23,7 +24,7 @@ describe('set', function () {
   })
 
   it('should store a value with a specific ttl', function (done) {
-    memcachedCache.set('foo', 'bar', config.memcached.ttl, function (err, ok) {
+    memcachedCache.set('foo', 'bar', config.memcached.maxExpiration, function (err, ok) {
       expect(err).toBe(null)
       expect(ok).toBe(true)
       done()
@@ -34,15 +35,6 @@ describe('set', function () {
     memcachedCache.set('foo', 'bar', 30, function (err, ok) {
       expect(err).toBe(null)
       expect(ok).toBe(true)
-      done()
-    })
-  })
-
-  it('should store a value without callback', function (done) {
-    memcachedCache.set('foo', 'baz')
-    memcachedCache.get('foo', function (err, value) {
-      expect(err).toBe(null)
-      expect(value).toBe('baz')
       done()
     })
   })
@@ -80,14 +72,6 @@ describe('get', function () {
       })
     })
   })
-
-  it('should return undefined when the key is invalid', function (done) {
-    memcachedCache.get('invalidKey', function (err, result) {
-      expect(err).toBe(null)
-      expect(result).toBe(undefined)
-      done()
-    })
-  })
 })
 
 describe('del', function () {
@@ -116,16 +100,11 @@ describe('reset', function () {
 
         memcachedCache.get('foo', function (err, value) {
           expect(err).toBe(null)
-          expect(value).toBe(undefined)
+          expect(value).toBe(null)
           done()
         })
       })
     })
-  })
-
-  it('should flush underlying db without callback', function (done) {
-    memcachedCache.reset()
-    done()
   })
 })
 
@@ -137,7 +116,6 @@ describe('keys', function () {
       memcachedCache.set('foo', 'bar', function () {
         memcachedCache.keys(function (err, keys) {
           expect(err).toBe(null)
-          console.log(keys)
           expect(keys.length).toBe(1)
           done()
         })
@@ -178,20 +156,6 @@ describe('getClient', function () {
       expect(memcached).not.toBe(null)
       expect(memcached.client).not.toBe(null)
       done()
-    })
-  })
-})
-
-describe('memcachedErrorEvent', function () {
-  it('should return an error when the memcached server is unavailable', function (done) {
-    memcachedCache.store.events.on('memcachedFailure', function (err) {
-      expect(err).not.toBe(null)
-      done()
-    })
-    memcachedCache.store.getClient(function (err, memcached) {
-      if (err) { return done.fail() }
-
-      memcached.client.emit('failure', 'Something unexpected')
     })
   })
 })
