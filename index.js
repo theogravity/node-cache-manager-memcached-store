@@ -7,10 +7,19 @@ function MemcachedClient (options) {
     throw new Error('[cache-manager] memcache options not defined')
   }
 
-  this.memcached = new Memcached(this.options.memcached)
+  this.memcached = new Memcached(this.options.options)
 }
 
 MemcachedClient.prototype.name = 'memcached'
+
+/**
+ * Used for testing; Gets the set options
+ * @returns {object}
+ * @private
+ */
+MemcachedClient.prototype._getOptions = function () {
+  return this.options
+}
 
 /**
  * See https://github.com/BryanDonovan/node-cache-manager/blob/master/lib/caching.js

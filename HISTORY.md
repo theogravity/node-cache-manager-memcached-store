@@ -1,3 +1,9 @@
+# 2.1.0 (2016-10-27)
+
+  * The API for sending options through was incorrect.
+  * Because of the fix, the `hosts` was defaulted to the library default.
+  * `hosts` must always be an array
+
 # 2.0.0 (2016-10-24)
 
   * Replace `memcached` library with `memcached-plus`. 

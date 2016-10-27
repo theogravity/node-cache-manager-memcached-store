@@ -24,7 +24,7 @@ var memcachedCache = cacheManager.caching({
     store: memcachedStore,
     // http://memcache-plus.com/initialization.html - see options
     options: {
-        hosts: '127.0.0.1:27017'
+        hosts: ['127.0.0.1:11211']
     } 
 })
 

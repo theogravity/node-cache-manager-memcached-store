@@ -9,8 +9,19 @@ beforeAll(function () {
   memcachedCache = require('cache-manager').caching({
     store: memcachedStore,
     options: {
-      hosts: process.env.MEMCACHED__HOST || config.memcached.host + ':' + config.memcached.port
+      hosts: [process.env.MEMCACHED__HOST || config.memcached.host + ':' + config.memcached.port],
+      testOption: true
     }
+  })
+})
+
+describe('options', function () {
+  it('should return the options', function (done) {
+    memcachedCache.store.getClient(function (err, memcached) {
+      expect(err).toBe(null)
+      expect(memcached.client.testOption).toBe(true)
+      done()
+    })
   })
 })
 
