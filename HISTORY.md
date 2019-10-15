@@ -1,3 +1,6 @@
+# UNRELEASED
+  * Updated `memcache-plus` version to 0.2.20
+
 # 2.1.0 (2016-10-27)
 
   * The API for sending options through was incorrect.
