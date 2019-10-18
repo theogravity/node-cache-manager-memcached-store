@@ -27,7 +27,7 @@
     "standard": "7.1.2"
   },
   "dependencies": {
-    "memcache-plus": "0.2.16",
+    "memcache-plus": "0.2.20",
     "xtend": "4.0.1"
   }
 }
