@@ -1,5 +1,6 @@
-# UNRELEASED
-  * Updated `memcache-plus` version to 0.2.20
+# 2.2.0 (2019-10-18)
+
+* Updated `memcache-plus` version to 0.2.20
 
 # 2.1.0 (2016-10-27)
 
