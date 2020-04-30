@@ -4,7 +4,9 @@
   "description": "memcached impl for cache-manager",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine && standard"
+    "test": "jasmine && standard",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,8 @@
   },
   "dependencies": {
     "memcache-plus": "0.2.20",
-    "xtend": "4.0.1"
-  }
+    "xtend": "4.0.1",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
