@@ -3,6 +3,7 @@
   * get, set, del and reset methods now returns a promise if cb hasn't been passed.
   * In some cases keys test could fail without a delay between set key and get cachedump.
   1 second delay added for get keys test.
+  * Removed not in use package xtend from the deps.
 
 # 2.3.0 (2021-01-04)
 
