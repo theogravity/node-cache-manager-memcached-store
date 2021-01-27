@@ -34,21 +34,22 @@ MemcachedClient.prototype._getOptions = function () {
  * @param {Function} cb - A callback that returns a potential error and the response
  */
 MemcachedClient.prototype.get = function (key, options, cb) {
+  var args = [key]
+
   if (typeof options === 'function') {
     cb = options
-
-    this.memcached.get(key).then(function (value) {
-      cb(null, value)
-    }).catch(function (err) {
-      cb(err, null)
-    })
-  } else {
-    this.memcached.get(key, options).then(function (value) {
-      cb(null, value)
-    }).catch(function (err) {
-      cb(err, null)
-    })
+  } else if (options !== null && typeof options === 'object') {
+    args.push(options)
   }
+
+  var result = this.memcached.get.apply(this.memcached, args)
+  if (typeof cb !== 'function') return result
+
+  result.then(function (value) {
+    cb(null, value)
+  }).catch(function (err) {
+    cb(err, null)
+  })
 }
 
 /**
@@ -61,35 +62,22 @@ MemcachedClient.prototype.get = function (key, options, cb) {
  * @param {Function} [cb] - A callback that returns a potential error, otherwise null
  */
 MemcachedClient.prototype.set = function (key, value, options, cb) {
-  var opt = {
-    ttl: 2592000
-  }
+  var args = [key, value]
 
   if (typeof options === 'function') {
     cb = options
-
-    this.memcached.set(key, value).then(function () {
-      cb(null, true)
-    }).catch(function (err) {
-      cb(err, null)
-    })
-  } else if (typeof options === 'number') {
-    opt = {
-      ttl: options
-    }
-
-    this.memcached.set(key, value, opt.ttl).then(function () {
-      cb(null, true)
-    }).catch(function (err) {
-      cb(err, null)
-    })
-  } else if (typeof options === 'object') {
-    this.memcached.set(key, value, options).then(function () {
-      cb(null, true)
-    }).catch(function (err) {
-      cb(err, null)
-    })
+  } else if (typeof options === 'number' || (options !== null && typeof options === 'object')) {
+    args.push(options)
   }
+
+  var result = this.memcached.set.apply(this.memcached, args)
+  if (typeof cb !== 'function') return result
+
+  result.then(function () {
+    cb(null, true)
+  }).catch(function (err) {
+    cb(err, null)
+  })
 }
 
 /**
@@ -102,11 +90,12 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
 MemcachedClient.prototype.del = function (key, options, cb) {
   if (typeof options === 'function') {
     cb = options
-  } else if (!options) {
-    cb = function () {}
   }
 
-  this.memcached.delete(key).then(function () {
+  var result = this.memcached.delete(key)
+  if (typeof cb !== 'function') return result
+
+  result.then(function () {
     cb(null, null)
   }).catch(function (err) {
     cb(err, null)
@@ -120,7 +109,7 @@ MemcachedClient.prototype.del = function (key, options, cb) {
  */
 MemcachedClient.prototype.reset = function (cb) {
   if (typeof cb !== 'function') {
-    cb = function () {}
+    return this.memcached.flush()
   }
 
   this.memcached.flush().then(function () {
