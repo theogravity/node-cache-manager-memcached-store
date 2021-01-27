@@ -1,5 +1,8 @@
 /*global describe, it, expect, beforeAll */
 
+// Uncomment line below to enable memcache-plus debug logging.
+// process.env.DEBUG = 'memcache-plus:*'
+
 var config = require('../config.json')
 var memcachedStore = require('../../index')
 
@@ -125,11 +128,13 @@ describe('keys', function () {
       expect(err).toBe(null)
 
       memcachedCache.set('foo', 'bar', function () {
-        memcachedCache.keys(function (err, keys) {
-          expect(err).toBe(null)
-          expect(keys.length).toBe(1)
-          done()
-        })
+        setTimeout(function () {
+          memcachedCache.keys(function (err, keys) {
+            expect(err).toBe(null)
+            expect(keys.length).toBe(1)
+            done()
+          })
+        }, 1000)
       })
     })
   })
