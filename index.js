@@ -193,10 +193,15 @@ function handleError (cb) {
 
 // from: http://blog.pointerstack.com/2012/08/nodejs-extract-keys-from-memcache-server.html
 function getKeys (memcached, cb) {
-  var keyArray = []
-  var keyLength = 0
-
   memcached.items().then(function (items) {
+    // Returns an empty array if no items in cache.
+    if (items.length === 0) {
+      return cb(null, [])
+    }
+
+    var keyArray = []
+    var keyLength = 0
+
     items.forEach(function (item) {
       keyLength += item.data.number
 

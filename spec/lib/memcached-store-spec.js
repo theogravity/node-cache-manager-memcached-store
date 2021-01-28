@@ -1,4 +1,4 @@
-/*global describe, it, expect, beforeAll */
+/* global describe, it, expect, beforeAll, afterAll */
 
 // Uncomment line below to enable memcache-plus debug logging.
 // process.env.DEBUG = 'memcache-plus:*'
@@ -8,6 +8,8 @@ var memcachedStore = require('../../index')
 
 var memcachedCache
 
+var cacheKeys = ['foo', 'foo1']
+
 beforeAll(function () {
   memcachedCache = require('cache-manager').caching({
     store: memcachedStore,
@@ -15,6 +17,12 @@ beforeAll(function () {
       hosts: [process.env.MEMCACHED__HOST || config.memcached.host + ':' + config.memcached.port],
       testOption: true
     }
+  })
+})
+
+afterAll(function () {
+  cacheKeys.forEach(function (key) {
+    memcachedCache.del(key)
   })
 })
 
