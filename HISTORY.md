@@ -5,6 +5,7 @@
   1 second delay added for get keys test.
   * Removed not in use package xtend from the deps.
   * Update dev deps: jasmine@3.6.4, cache-manager@3.4.0
+  * Add tests for promise get, set, del and reset methods.
 
 # 2.3.0 (2021-01-04)
 
