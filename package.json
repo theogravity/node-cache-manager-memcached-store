@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/theogravity/node-cache-manager-memcached#readme",
   "devDependencies": {
-    "cache-manager": "2.1.2",
-    "jasmine": "2.4.1",
+    "cache-manager": "3.4.0",
+    "jasmine": "^3.6.4",
     "standard": "7.1.2"
   },
   "dependencies": {
