@@ -71,7 +71,11 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
   }
 
   var result = this.memcached.set.apply(this.memcached, args)
-  if (typeof cb !== 'function') return result
+  if (typeof cb !== 'function') {
+    return result.then(function () {
+      return true
+    })
+  }
 
   result.then(function () {
     cb(null, true)
@@ -93,7 +97,11 @@ MemcachedClient.prototype.del = function (key, options, cb) {
   }
 
   var result = this.memcached.delete(key)
-  if (typeof cb !== 'function') return result
+  if (typeof cb !== 'function') {
+    return result.then(function () {
+      return null
+    })
+  }
 
   result.then(function () {
     cb(null, null)
@@ -108,11 +116,15 @@ MemcachedClient.prototype.del = function (key, options, cb) {
  * @param {Function} [cb] - A callback that returns a potential error, otherwise null
  */
 MemcachedClient.prototype.reset = function (cb) {
+  var result = this.memcached.flush()
+
   if (typeof cb !== 'function') {
-    return this.memcached.flush()
+    return result.then(function () {
+      return null
+    })
   }
 
-  this.memcached.flush().then(function () {
+  result.then(function () {
     cb(null)
   }).catch(function (err) {
     cb(err, null)
@@ -181,10 +193,15 @@ function handleError (cb) {
 
 // from: http://blog.pointerstack.com/2012/08/nodejs-extract-keys-from-memcache-server.html
 function getKeys (memcached, cb) {
-  var keyArray = []
-  var keyLength = 0
-
   memcached.items().then(function (items) {
+    // Returns an empty array if no items in cache.
+    if (items.length === 0) {
+      return cb(null, [])
+    }
+
+    var keyArray = []
+    var keyLength = 0
+
     items.forEach(function (item) {
       keyLength += item.data.number
 

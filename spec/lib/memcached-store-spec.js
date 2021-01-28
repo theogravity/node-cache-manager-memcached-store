@@ -1,4 +1,4 @@
-/*global describe, it, expect, beforeAll */
+/* global describe, it, expect, beforeAll, afterAll */
 
 // Uncomment line below to enable memcache-plus debug logging.
 // process.env.DEBUG = 'memcache-plus:*'
@@ -8,6 +8,8 @@ var memcachedStore = require('../../index')
 
 var memcachedCache
 
+var cacheKeys = ['foo', 'foo1']
+
 beforeAll(function () {
   memcachedCache = require('cache-manager').caching({
     store: memcachedStore,
@@ -15,6 +17,12 @@ beforeAll(function () {
       hosts: [process.env.MEMCACHED__HOST || config.memcached.host + ':' + config.memcached.port],
       testOption: true
     }
+  })
+})
+
+afterAll(function () {
+  cacheKeys.forEach(function (key) {
+    memcachedCache.del(key)
   })
 })
 
@@ -62,6 +70,17 @@ describe('set', function () {
       })
     })
   })
+
+  it('should store a value & return promise if no callback provided', function (done) {
+    var result = memcachedCache.set('foo', 'bar')
+    expect(result.then).toBeInstanceOf(Function)
+    result.then(function (ok) {
+      expect(ok).toBe(true)
+      done()
+    }).catch(function (err) {
+      done(err)
+    })
+  })
 })
 
 describe('get', function () {
@@ -86,6 +105,21 @@ describe('get', function () {
       })
     })
   })
+
+  it('should retrieve a value for a given key & return promise if no cb passed', function (done) {
+    var value = 'bar'
+    memcachedCache.set('foo', value)
+      .then(function () {
+        var res = memcachedCache.get('foo')
+        expect(res.then).toBeInstanceOf(Function)
+        return res
+      }).then(function (result) {
+        expect(result).toBe(value)
+        done()
+      }).catch(function (err) {
+        done(err)
+      })
+  })
 })
 
 describe('del', function () {
@@ -98,11 +132,19 @@ describe('del', function () {
     })
   })
 
-  it('should delete a value for a given key without callback', function (done) {
-    memcachedCache.set('foo', 'bar', function () {
-      memcachedCache.del('foo')
-      done()
-    })
+  it('should delete a value for a given key & return promise if no cb passed', function (done) {
+    var value = 'bar'
+    memcachedCache.set('foo', value)
+      .then(function () {
+        var res = memcachedCache.del('foo')
+        expect(res.then).toBeInstanceOf(Function)
+        return res
+      }).then(function (result) {
+        expect(result).toBe(null)
+        done()
+      }).catch(function (err) {
+        done(err)
+      })
   })
 })
 
@@ -119,6 +161,23 @@ describe('reset', function () {
         })
       })
     })
+  })
+
+  it('should flush underlying db & return promise if no cb passed', function (done) {
+    memcachedCache.set('foo', 'bar')
+      .then(function () {
+        var res = memcachedCache.reset()
+        expect(res.then).toBeInstanceOf(Function)
+        return res
+      }).then(function (result) {
+        expect(result).toBe(null)
+        return memcachedCache.get('foo')
+      }).then(function (result) {
+        expect(result).toBe(null)
+        done()
+      }).catch(function (err) {
+        done(err)
+      })
   })
 })
 

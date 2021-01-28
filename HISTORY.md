@@ -4,6 +4,9 @@
   * In some cases keys test could fail without a delay between set key and get cachedump.
   1 second delay added for get keys test.
   * Removed not in use package xtend from the deps.
+  * Update dev deps: jasmine@3.6.4, cache-manager@3.4.0, standard@8.6.0.
+  * Add tests for promise get, set, del and reset methods, add clean up routine with afterAll.
+  * Fix getKeys: never invoke a callback if there are no items in cache.
 
 # 2.3.0 (2021-01-04)
 
