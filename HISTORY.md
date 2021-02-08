@@ -1,7 +1,9 @@
 # UNRELEASED
   * Update standard to the latest version.
   * Use const/let instead of var to comply new standard rules.
-  * Use memcache-pp instead of memcache-plus.
+  * Use arrow funcs.
+  * Make code lighter.
+  * Use memcache-pp(supports unix sockets, less dependencies) instead of memcache-plus.
 
 # 3.0.0 (2021-01-28)
 
