@@ -42,7 +42,7 @@ MemcachedClient.prototype.get = function (key, options, cb) {
     args.push(options)
   }
 
-  const result = this.memcached.get.apply(this.memcached, args)
+  const result = this.memcached.get(...args)
   if (typeof cb !== 'function') return result
 
   result.then(function (value) {
@@ -70,7 +70,7 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
     args.push(options)
   }
 
-  const result = this.memcached.set.apply(this.memcached, args)
+  const result = this.memcached.set(...args)
   if (typeof cb !== 'function') {
     return result.then(function () {
       return true
