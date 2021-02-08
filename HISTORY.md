@@ -1,4 +1,9 @@
 # UNRELEASED
+  * Update standard to the latest version.
+  * Use const/let instead of var to comply new standard rules.
+  * Use memcache-pp instead of memcache-plus.
+
+# 3.0.0 (2021-01-28)
 
   * get, set, del and reset methods now returns a promise if cb hasn't been passed.
   * In some cases keys test could fail without a delay between set key and get cachedump.
