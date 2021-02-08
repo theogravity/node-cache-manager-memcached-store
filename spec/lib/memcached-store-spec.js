@@ -3,12 +3,12 @@
 // Uncomment line below to enable memcache-plus debug logging.
 // process.env.DEBUG = 'memcache-plus:*'
 
-var config = require('../config.json')
-var memcachedStore = require('../../index')
+const config = require('../config.json')
+const memcachedStore = require('../../index')
 
-var memcachedCache
+let memcachedCache
 
-var cacheKeys = ['foo', 'foo1']
+const cacheKeys = ['foo', 'foo1']
 
 beforeAll(function () {
   memcachedCache = require('cache-manager').caching({
@@ -72,7 +72,7 @@ describe('set', function () {
   })
 
   it('should store a value & return promise if no callback provided', function (done) {
-    var result = memcachedCache.set('foo', 'bar')
+    const result = memcachedCache.set('foo', 'bar')
     expect(result.then).toBeInstanceOf(Function)
     result.then(function (ok) {
       expect(ok).toBe(true)
@@ -85,7 +85,7 @@ describe('set', function () {
 
 describe('get', function () {
   it('should retrieve a value for a given key', function (done) {
-    var value = 'bar'
+    const value = 'bar'
     memcachedCache.set('foo', value, function () {
       memcachedCache.get('foo', function (err, result) {
         expect(err).toBe(null)
@@ -96,7 +96,7 @@ describe('get', function () {
   })
 
   it('should retrieve a value for a given key if options provided', function (done) {
-    var value = 'bar'
+    const value = 'bar'
     memcachedCache.set('foo', value, function () {
       memcachedCache.get('foo', {}, function (err, result) {
         expect(err).toBe(null)
@@ -107,10 +107,10 @@ describe('get', function () {
   })
 
   it('should retrieve a value for a given key & return promise if no cb passed', function (done) {
-    var value = 'bar'
+    const value = 'bar'
     memcachedCache.set('foo', value)
       .then(function () {
-        var res = memcachedCache.get('foo')
+        const res = memcachedCache.get('foo')
         expect(res.then).toBeInstanceOf(Function)
         return res
       }).then(function (result) {
@@ -133,10 +133,10 @@ describe('del', function () {
   })
 
   it('should delete a value for a given key & return promise if no cb passed', function (done) {
-    var value = 'bar'
+    const value = 'bar'
     memcachedCache.set('foo', value)
       .then(function () {
-        var res = memcachedCache.del('foo')
+        const res = memcachedCache.del('foo')
         expect(res.then).toBeInstanceOf(Function)
         return res
       }).then(function (result) {
@@ -166,7 +166,7 @@ describe('reset', function () {
   it('should flush underlying db & return promise if no cb passed', function (done) {
     memcachedCache.set('foo', 'bar')
       .then(function () {
-        var res = memcachedCache.reset()
+        const res = memcachedCache.reset()
         expect(res.then).toBeInstanceOf(Function)
         return res
       }).then(function (result) {
@@ -236,7 +236,7 @@ describe('getClient', function () {
 })
 
 describe('overridable isCacheableValue function', function () {
-  var memcachedCache2
+  let memcachedCache2
 
   beforeAll(function () {
     memcachedCache2 = require('cache-manager').caching({

@@ -1,4 +1,4 @@
-var Memcached = require('memcache-plus')
+const Memcached = require('memcache-pp')
 
 function MemcachedClient (options) {
   this.options = options
@@ -34,7 +34,7 @@ MemcachedClient.prototype._getOptions = function () {
  * @param {Function} cb - A callback that returns a potential error and the response
  */
 MemcachedClient.prototype.get = function (key, options, cb) {
-  var args = [key]
+  const args = [key]
 
   if (typeof options === 'function') {
     cb = options
@@ -42,7 +42,7 @@ MemcachedClient.prototype.get = function (key, options, cb) {
     args.push(options)
   }
 
-  var result = this.memcached.get.apply(this.memcached, args)
+  const result = this.memcached.get.apply(this.memcached, args)
   if (typeof cb !== 'function') return result
 
   result.then(function (value) {
@@ -62,7 +62,7 @@ MemcachedClient.prototype.get = function (key, options, cb) {
  * @param {Function} [cb] - A callback that returns a potential error, otherwise null
  */
 MemcachedClient.prototype.set = function (key, value, options, cb) {
-  var args = [key, value]
+  const args = [key, value]
 
   if (typeof options === 'function') {
     cb = options
@@ -70,7 +70,7 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
     args.push(options)
   }
 
-  var result = this.memcached.set.apply(this.memcached, args)
+  const result = this.memcached.set.apply(this.memcached, args)
   if (typeof cb !== 'function') {
     return result.then(function () {
       return true
@@ -96,7 +96,7 @@ MemcachedClient.prototype.del = function (key, options, cb) {
     cb = options
   }
 
-  var result = this.memcached.delete(key)
+  const result = this.memcached.delete(key)
   if (typeof cb !== 'function') {
     return result.then(function () {
       return null
@@ -116,7 +116,7 @@ MemcachedClient.prototype.del = function (key, options, cb) {
  * @param {Function} [cb] - A callback that returns a potential error, otherwise null
  */
 MemcachedClient.prototype.reset = function (cb) {
-  var result = this.memcached.flush()
+  const result = this.memcached.flush()
 
   if (typeof cb !== 'function') {
     return result.then(function () {
@@ -199,8 +199,8 @@ function getKeys (memcached, cb) {
       return cb(null, [])
     }
 
-    var keyArray = []
-    var keyLength = 0
+    const keyArray = []
+    let keyLength = 0
 
     items.forEach(function (item) {
       keyLength += item.data.number
