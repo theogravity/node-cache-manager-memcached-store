@@ -1,10 +1,12 @@
 {
   "name": "cache-manager-memcached-store",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "memcached impl for cache-manager",
   "main": "index.js",
   "scripts": {
-    "test": "jasmine && standard"
+    "test": "jasmine && standard",
+    "standard": "standard",
+    "standard:fix": "standard --fix"
   },
   "repository": {
     "type": "git",
@@ -24,9 +26,9 @@
   "devDependencies": {
     "cache-manager": "3.4.0",
     "jasmine": "3.6.4",
-    "standard": "8.6.0"
+    "standard": "16.0.3"
   },
   "dependencies": {
-    "memcache-plus": "0.2.22"
+    "memcache-pp": "^0.3.2"
   }
 }
