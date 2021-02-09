@@ -1,4 +1,5 @@
 # UNRELEASED
+
   * Update standard to the latest version.
   * Use const/let instead of var to comply new standard rules.
   * Use arrow funcs.
