@@ -6,7 +6,7 @@ The Memcached store for the [node-cache-manager](https://github.com/BryanDonovan
 
 Module can use different compatible memcache clients as the underlying memcache library:
 
- * [memcached-pp](https://github.com/victorquinn/memcache-plus)
+ * [memcached-pp](https://github.com/RomanBurunkov/memcache-pp)
  * [memcached-plus](https://github.com/victorquinn/memcache-plus)
 
 ### Installation
