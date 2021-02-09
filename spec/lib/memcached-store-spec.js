@@ -4,6 +4,7 @@
 // process.env.DEBUG = 'memcache-plus:*'
 
 const config = require('../config.json')
+const Memcache = require('memcache-pp')
 const memcachedStore = require('../../index')
 
 let memcachedCache
@@ -13,6 +14,7 @@ const cacheKeys = ['foo', 'foo1']
 beforeAll(function () {
   memcachedCache = require('cache-manager').caching({
     store: memcachedStore,
+    driver: Memcache,
     options: {
       hosts: [process.env.MEMCACHED__HOST || config.memcached.host + ':' + config.memcached.port],
       testOption: true
@@ -241,6 +243,7 @@ describe('overridable isCacheableValue function', function () {
   beforeAll(function () {
     memcachedCache2 = require('cache-manager').caching({
       store: memcachedStore,
+      driver: Memcache,
       host: process.env.MEMCACHED__HOST || config.memcached.host,
       port: config.memcached.port,
       isCacheableValue: function () { return 'I was overridden' }

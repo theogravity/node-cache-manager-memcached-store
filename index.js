@@ -1,11 +1,20 @@
-const Memcached = require('memcache-pp')
 
+/**
+ * @constructor
+ * @param {Object} options cache-manager options.
+ * @param {Object} options.options Memcache driver options.
+ * @param {Function} options.driver Memcache driver constructor/class e.g. memcache-plus.
+ */
 function MemcachedClient (options) {
   this.options = options
 
   if (!this.options) {
     throw new Error('[cache-manager] memcache options not defined')
+  } else if (!this.options.driver) {
+    throw new Error('[cache-manager] memcache driver not specified')
   }
+
+  const Memcached = this.options.driver
 
   this.memcached = new Memcached(this.options.options)
 }

@@ -2,9 +2,20 @@
  
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](http://standardjs.com) [![Build Status](https://travis-ci.org/theogravity/node-cache-manager-memcached-store.svg?branch=master)](https://travis-ci.org/theogravity/node-cache-manager-memcached-store) [![npm version](https://badge.fury.io/js/cache-manager-memcached-store.svg)](https://badge.fury.io/js/cache-manager-memcached-store)
 
-The Memcached store for the [node-cache-manager](https://github.com/BryanDonovan/node-cache-manager) module and uses [memcached-plus](https://github.com/victorquinn/memcache-plus) as the underlying memcache library.
+The Memcached store for the [node-cache-manager](https://github.com/BryanDonovan/node-cache-manager)
+
+Module can use different compatable memcache clients as the underlying memcache library:
+
+ * [memcached-pp](https://github.com/victorquinn/memcache-plus)
+ * [memcached-plus](https://github.com/victorquinn/memcache-plus)
 
 ### Installation
+
+Install memcache client and cache-manager-memcached-store
+
+```sh
+npm i memcached-pp --save
+```
 
 ```sh
 npm i cache-manager-memcached-store --save
@@ -14,21 +25,26 @@ npm i cache-manager-memcached-store --save
 
 Some of the project scaffolding and test/comments are lifted from [node-cache-manager-redis](https://github.com/dial-once/node-cache-manager-redis)
 
+Till version 3.0.0 cache-manager-memcached-store uses memcache-plus as the underlying memcache library.
+Newer versions allow to choose any compatibale library by passing library in driver option. See example below.
+
 ### Usage examples
 
 ```js
-var cacheManager = require('cache-manager')
-var memcachedStore = require('cache-manager-memcached-store')
+const Memcache = require('memcache-pp')
+const cacheManager = require('cache-manager')
+const memcachedStore = require('cache-manager-memcached-store')
 
-var memcachedCache = cacheManager.caching({
+const memcachedCache = cacheManager.caching({
     store: memcachedStore,
+    driver: Memcache,
     // http://memcache-plus.com/initialization.html - see options
     options: {
         hosts: ['127.0.0.1:11211']
     } 
 })
 
-var ttl = 30
+const ttl = 30
 
 // Compression must be manually set - see memcached-plus documentation
 // The key must always be a string

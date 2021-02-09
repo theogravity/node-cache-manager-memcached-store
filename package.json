@@ -26,9 +26,7 @@
   "devDependencies": {
     "cache-manager": "3.4.0",
     "jasmine": "3.6.4",
+    "memcache-pp": "^0.3.3",
     "standard": "16.0.3"
-  },
-  "dependencies": {
-    "memcache-pp": "^0.3.2"
   }
 }

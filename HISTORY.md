@@ -4,6 +4,7 @@
   * Use arrow funcs.
   * Make code lighter.
   * Use memcache-pp(supports unix sockets, less dependencies) instead of memcache-plus.
+  * Add `driver` option which allow to use any compatible memcache client library.
 
 # 3.0.0 (2021-01-28)
 
