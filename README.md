@@ -6,15 +6,15 @@ The Memcached store for the [node-cache-manager](https://github.com/BryanDonovan
 
 Module can use different compatible memcache clients as the underlying memcache library:
 
- * [memcached-pp](https://github.com/RomanBurunkov/memcache-pp)
- * [memcached-plus](https://github.com/victorquinn/memcache-plus)
+ * [memcache-pp](https://github.com/RomanBurunkov/memcache-pp)
+ * [memcache-plus](https://github.com/victorquinn/memcache-plus)
 
 ### Installation
 
-Install memcache client and cache-manager-memcached-store
+Install one of the memcached clients from above and `cache-manager-memcached-store`
 
 ```sh
-npm i memcached-pp --save
+npm i memcache-pp --save
 ```
 
 ```sh
@@ -25,7 +25,7 @@ npm i cache-manager-memcached-store --save
 
 Some of the project scaffolding and test/comments are lifted from [node-cache-manager-redis](https://github.com/dial-once/node-cache-manager-redis)
 
-Till version 3.0.0 cache-manager-memcached-store uses memcache-plus as the underlying memcache library.
+Till version 3.0.0 `cache-manager-memcached-store` uses `memcache-plus` as the underlying memcached library.
 Newer versions allow to choose any compatible library by passing it's constructor in a driver option. See example below.
 
 ### Usage examples

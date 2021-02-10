@@ -1,6 +1,6 @@
 {
   "name": "cache-manager-memcached-store",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "memcached impl for cache-manager",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,10 @@
     "memcached",
     "cache-manager"
   ],
-  "author": "Theo Gravity <theo@suteki.nu>",
+  "contributors": [
+    "Theo Gravity <theo@suteki.nu>",
+    "Roman Burunkov <romon2002@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/theogravity/node-cache-manager-memcached/issues"

@@ -1,10 +1,11 @@
-# 3.0.0 (2021-01-28)
+# 4.0.0 (2021-02-10)
 
-  * Update standard to the latest version.
-  * Use const/let instead of var to comply new standard rules.
+The library no longer depends on `memcache-plus`. A `driver` parameter is now required,
+which will let you use `memcache-plus` or `memcache-pp` as the driver to use.
+
+  * Update `standard` to the latest version.
+  * Use `const/let` instead of var to comply new standard rules.
   * Use arrow funcs.
-  * Make code lighter.
-  * Use memcache-pp(supports unix sockets, less dependencies) instead of memcache-plus.
   * Add `driver` option which allow to use any compatible memcache client library.
 
 # 3.0.0 (2021-01-28)
