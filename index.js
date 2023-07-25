@@ -1,4 +1,3 @@
-
 /**
  * @constructor
  * @param {Object} options cache-manager options.
@@ -54,9 +53,28 @@ MemcachedClient.prototype.get = function (key, options, cb) {
   const result = this.memcached.get(...args)
   if (typeof cb !== 'function') return result
 
-  result
-    .then(val => cb(null, val))
-    .catch(err => cb(err, null))
+  result.then((val) => cb(null, val)).catch((err) => cb(err, null))
+}
+/**
+ * Get a value for a given key.
+ * @method mget
+ * @param {String[]} keys - The cache key
+ * @param {Object} [options] - The options (optional)
+ * @param {Function} cb - A callback that returns a potential error and the response
+ */
+MemcachedClient.prototype.mget = function (keys, options, cb) {
+  const args = [keys]
+
+  if (typeof options === 'function') {
+    cb = options
+  } else if (options !== null && typeof options === 'object') {
+    args.push(options)
+  }
+
+  const result = this.memcached.getMulti(...args)
+  if (typeof cb !== 'function') return result
+
+  result.then((val) => cb(null, val)).catch((err) => cb(err, null))
 }
 
 /**
@@ -73,7 +91,10 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
 
   if (typeof options === 'function') {
     cb = options
-  } else if (typeof options === 'number' || (options !== null && typeof options === 'object')) {
+  } else if (
+    typeof options === 'number' ||
+    (options !== null && typeof options === 'object')
+  ) {
     args.push(options)
   }
 
@@ -82,9 +103,35 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
     return result.then(() => true)
   }
 
-  result
-    .then(() => cb(null, true))
-    .catch(err => cb(err, null))
+  result.then(() => cb(null, true)).catch((err) => cb(err, null))
+}
+/**
+ * Set a value for a given key.
+ * @method mset
+ * @param {Array<Array<String>>} keyValues - The cache keys values like [[key1,value1],[key2,value2]]
+ * @param {Object} [options] - The options (optional)
+ * @param {Object} options.ttl - The ttl value. Default is 2592000 seconds
+ * @param {Function} [cb] - A callback that returns a potential error, otherwise null
+ */
+MemcachedClient.prototype.mset = function (keyValues, options, cb) {
+  let argsArr = keyValues
+  if (typeof options === 'function') {
+    cb = options
+  } else if (
+    typeof options === 'number' ||
+    (options !== null && typeof options === 'object')
+  ) {
+    argsArr = argsArr.map((args) => [...args, options])
+  }
+
+  const result = Promise.all(
+    argsArr.map((args) => this.memcached.set(...args))
+  )
+  if (typeof cb !== 'function') {
+    return result.then(() => true)
+  }
+
+  result.then(() => cb(null, true)).catch((err) => cb(err, null))
 }
 
 /**
@@ -104,9 +151,27 @@ MemcachedClient.prototype.del = function (key, options, cb) {
     return result.then(() => null)
   }
 
-  result
-    .then(() => cb(null, null))
-    .catch(err => cb(err, null))
+  result.then(() => cb(null, null)).catch((err) => cb(err, null))
+}
+
+/**
+ * Delete value of a given key
+ * @method del
+ * @param {Array<String>} keys - The cache key
+ * @param {Object} [options] - The options (optional)
+ * @param {Function} [cb] - A callback that returns a potential error, otherwise null
+ */
+MemcachedClient.prototype.mdel = function (keys, options, cb) {
+  if (typeof options === 'function') {
+    cb = options
+  }
+
+  const result = this.memcached.deleteMulti(keys)
+  if (typeof cb !== 'function') {
+    return result.then(() => null)
+  }
+
+  result.then(() => cb(null, null)).catch((err) => cb(err, null))
 }
 
 /**
@@ -121,9 +186,7 @@ MemcachedClient.prototype.reset = function (cb) {
     return result.then(() => null)
   }
 
-  result
-    .then(() => cb(null, null))
-    .catch(err => cb(err, null))
+  result.then(() => cb(null, null)).catch((err) => cb(err, null))
 }
 
 /**
@@ -169,7 +232,7 @@ MemcachedClient.prototype.keys = function (pattern, cb) {
 }
 
 module.exports = {
-  create: args => new MemcachedClient(args)
+  create: (args) => new MemcachedClient(args)
 }
 
 function handleError (cb) {
@@ -182,35 +245,38 @@ function handleError (cb) {
 
 // from: http://blog.pointerstack.com/2012/08/nodejs-extract-keys-from-memcache-server.html
 function getKeys (memcached, cb) {
-  memcached.items().then((items) => {
-    // Returns an empty array if no items in cache.
-    if (items.length === 0) {
-      return cb(null, [])
-    }
+  memcached
+    .items()
+    .then((items) => {
+      // Returns an empty array if no items in cache.
+      if (items.length === 0) {
+        return cb(null, [])
+      }
 
-    const keyArray = []
-    let keyLength = 0
+      const keyArray = []
+      let keyLength = 0
 
-    items.forEach((item) => {
-      keyLength += item.data.number
+      items.forEach((item) => {
+        keyLength += item.data.number
 
-      memcached.cachedump(item.slab_id, item.data.number).then((dataSet) => {
-        dataSet.forEach((data) => {
-          if (data.key) {
-            memcached.get(data.key).then((val) => {
-              if (val) {
-                keyArray.push(data.key)
-              }
+        memcached.cachedump(item.slab_id, item.data.number).then((dataSet) => {
+          dataSet.forEach((data) => {
+            if (data.key) {
+              memcached.get(data.key).then((val) => {
+                if (val) {
+                  keyArray.push(data.key)
+                }
 
-              keyLength -= 1
+                keyLength -= 1
 
-              if (keyLength === 0) {
-                cb(null, keyArray)
-              }
-            })
-          }
+                if (keyLength === 0) {
+                  cb(null, keyArray)
+                }
+              })
+            }
+          })
         })
       })
     })
-  }).catch(err => cb(err))
+    .catch((err) => cb(err))
 }
