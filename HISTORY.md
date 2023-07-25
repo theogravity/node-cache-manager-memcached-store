@@ -1,3 +1,7 @@
+# 4.1.0 (2023-07-25)
+ 
+  * @radiorz: feat: add `mget` `mset` `mdel` function
+
 # 4.0.0 (2021-02-10)
 
 The library no longer depends on `memcache-plus`. A `driver` parameter is now required,
