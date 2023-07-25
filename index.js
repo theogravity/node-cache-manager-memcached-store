@@ -113,7 +113,7 @@ MemcachedClient.prototype.set = function (key, value, options, cb) {
  * @param {Object} options.ttl - The ttl value. Default is 2592000 seconds
  * @param {Function} [cb] - A callback that returns a potential error, otherwise null
  */
-MemcachedClient.prototype.set = function (keyValues, options, cb) {
+MemcachedClient.prototype.mset = function (keyValues, options, cb) {
   let argsArr = keyValues
   if (typeof options === 'function') {
     cb = options
