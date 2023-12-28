@@ -51,7 +51,7 @@ MemcachedClient.prototype.get = function (key, options, cb) {
   }
 
   const result = this.memcached.get(...args).then((val) => {
-    if (val) return val.value
+    if (val && val.ttl) return val.value
     return val
   })
   if (typeof cb !== 'function') return result
@@ -76,7 +76,11 @@ MemcachedClient.prototype.mget = function (keys, options, cb) {
 
   const result = this.memcached.getMulti(...args).then((val) => {
     for (const key in val) {
-      if (val[key]) val[key] = val[key].value
+      if (val[key]) {
+        if (val[key].ttl) {
+          val[key] = val[key].value
+        }
+      }
     }
     return val
   })
