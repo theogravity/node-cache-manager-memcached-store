@@ -85,6 +85,53 @@ describe('set', function () {
   })
 })
 
+describe('mset', function () {
+  it('should store a value without ttl', function (done) {
+    memcachedCache.mset([['foo', 'bar']], function (err, ok) {
+      expect(err).toBe(null)
+      expect(ok).toBe(true)
+      done()
+    })
+  })
+
+  it('should store a value with a specific ttl', function (done) {
+    memcachedCache.mset([['foo', 'bar']], config.memcached.maxExpiration, function (err, ok) {
+      expect(err).toBe(null)
+      expect(ok).toBe(true)
+      done()
+    })
+  })
+
+  it('should store a value with a specific ttl 2', function (done) {
+    memcachedCache.mset([['foo', 'bar']], 30, function (err, ok) {
+      expect(err).toBe(null)
+      expect(ok).toBe(true)
+      done()
+    })
+  })
+
+  it('should not store an invalid value', function (done) {
+    memcachedCache.mset([['foo1', null]], function () {
+      memcachedCache.get('foo1', function (err, value) {
+        expect(err).toBe(null)
+        expect(value).toBe(null)
+        done()
+      })
+    })
+  })
+
+  it('should store a value & return promise if no callback provided', function (done) {
+    const result = memcachedCache.mset([['foo', 'bar']])
+    expect(result.then).toBeInstanceOf(Function)
+    result.then(function (ok) {
+      expect(ok).toBe(true)
+      done()
+    }).catch(function (err) {
+      done(err)
+    })
+  })
+})
+
 describe('get', function () {
   it('should retrieve a value for a given key', function (done) {
     const value = 'bar'
@@ -124,6 +171,45 @@ describe('get', function () {
   })
 })
 
+describe('mget', function () {
+  it('should retrieve a value for a given key', function (done) {
+    const value = 'bar'
+    memcachedCache.set('foo', value, function () {
+      memcachedCache.mget(['foo'], function (err, result) {
+        expect(err).toBe(null)
+        expect(result.foo).toBe(value)
+        done()
+      })
+    })
+  })
+
+  it('should retrieve a value for a given key if options provided', function (done) {
+    const value = 'bar'
+    memcachedCache.set('foo', value, function () {
+      memcachedCache.mget(['foo'], {}, function (err, result) {
+        expect(err).toBe(null)
+        expect(result.foo).toBe(value)
+        done()
+      })
+    })
+  })
+
+  it('should retrieve a value for a given key & return promise if no cb passed', function (done) {
+    const value = 'bar'
+    memcachedCache.set('foo', value)
+      .then(function () {
+        const res = memcachedCache.mget(['foo'])
+        expect(res.then).toBeInstanceOf(Function)
+        return res
+      }).then(function (result) {
+        expect(result.foo).toBe(value)
+        done()
+      }).catch(function (err) {
+        done(err)
+      })
+  })
+})
+
 describe('del', function () {
   it('should delete a value for a given key', function (done) {
     memcachedCache.set('foo', 'bar', function () {
@@ -148,6 +234,32 @@ describe('del', function () {
         done(err)
       })
   })
+})
+
+describe('mdel', function () {
+  it('should delete a value for a given key', function (done) {
+    memcachedCache.set('foo', 'bar', function () {
+      memcachedCache.mdel(['foo'], function (err) {
+        expect(err).toBe(null)
+        done()
+      })
+    })
+  }).pend('mdel is compatible only with node-cache-manager > 5.0.0')
+
+  it('should delete a value for a given key & return promise if no cb passed', function (done) {
+    const value = 'bar'
+    memcachedCache.set('foo', value)
+      .then(function () {
+        const res = memcachedCache.mdel(['foo'])
+        expect(res.then).toBeInstanceOf(Function)
+        return res
+      }).then(function (result) {
+        expect(result).toBe(null)
+        done()
+      }).catch(function (err) {
+        done(err)
+      })
+  }).pend('mdel is compatible only with node-cache-manager > 5.0.0')
 })
 
 describe('reset', function () {
