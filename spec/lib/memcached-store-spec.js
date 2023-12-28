@@ -175,9 +175,10 @@ describe('mget', function () {
   it('should retrieve a value for a given key', function (done) {
     const value = 'bar'
     memcachedCache.set('foo', value, function () {
-      memcachedCache.mget(['foo'], function (err, result) {
+      memcachedCache.mget(['foo', 'bar'], function (err, result) {
         expect(err).toBe(null)
         expect(result.foo).toBe(value)
+        expect(result.bar).toBe(null)
         done()
       })
     })
@@ -365,5 +366,18 @@ describe('overridable isCacheableValue function', function () {
   it('should return its return value instead of the built-in function', function (done) {
     expect(memcachedCache2.store.isCacheableValue(0)).toBe('I was overridden')
     done()
+  })
+})
+
+describe('ttl function', function () {
+  it('should return the remaining ttl of a key', function (done) {
+    memcachedCache.store.set('foo', 'bar', 10, function () {
+      memcachedCache.store.ttl('foo', function (err, ttl) {
+        expect(err).toBe(null)
+        expect(ttl).toBeLessThanOrEqual(10)
+        expect(ttl).toBeGreaterThan(9.9)
+        done()
+      })
+    })
   })
 })

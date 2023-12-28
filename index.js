@@ -50,7 +50,10 @@ MemcachedClient.prototype.get = function (key, options, cb) {
     args.push(options)
   }
 
-  const result = this.memcached.get(...args)
+  const result = this.memcached.get(...args).then((val) => {
+    if (val) return val.value
+    return val
+  })
   if (typeof cb !== 'function') return result
 
   result.then((val) => cb(null, val)).catch((err) => cb(err, null))
@@ -71,7 +74,12 @@ MemcachedClient.prototype.mget = function (keys, options, cb) {
     args.push(options)
   }
 
-  const result = this.memcached.getMulti(...args)
+  const result = this.memcached.getMulti(...args).then((val) => {
+    for (const key in val) {
+      if (val[key]) val[key] = val[key].value
+    }
+    return val
+  })
   if (typeof cb !== 'function') return result
 
   result.then((val) => cb(null, val)).catch((err) => cb(err, null))
@@ -88,15 +96,21 @@ MemcachedClient.prototype.mget = function (keys, options, cb) {
  */
 MemcachedClient.prototype.set = function (key, value, options, cb) {
   const args = [key, value]
+  let ttl = 2592000
 
   if (typeof options === 'function') {
     cb = options
-  } else if (
-    typeof options === 'number' ||
-    (options !== null && typeof options === 'object')
-  ) {
+  } else if (typeof options === 'number') {
+    ttl = options
+    args.push(Math.round(ttl))
+  } else if (options !== null && typeof options === 'object') {
+    if (options.ttl) {
+      ttl = options.ttl
+    }
     args.push(options)
   }
+
+  args[1] = { ttl: Date.now() + ttl * 1000, value }
 
   const result = this.memcached.set(...args)
   if (typeof cb !== 'function') {
@@ -125,7 +139,7 @@ MemcachedClient.prototype.mset = function (keyValues, options, cb) {
   }
 
   const result = Promise.all(
-    argsArr.map((args) => this.memcached.set(...args))
+    argsArr.map((args) => this.set(...args))
   )
   if (typeof cb !== 'function') {
     return result.then(() => true)
@@ -229,6 +243,23 @@ MemcachedClient.prototype.keys = function (pattern, cb) {
   }
 
   getKeys(this.memcached, handleError(cb))
+}
+
+/**
+ * Returns the remaining ttl in second (float) of a given key.
+ * @method ttl
+ * @param {String} key - the key to check
+ * @param {Function} cb - A callback that returns a potential error and the response
+ */
+MemcachedClient.prototype.ttl = function (key, cb) {
+  const result = this.memcached.get(key).then((val) => {
+    if (val) return (val.ttl - Date.now()) / 1000
+    return val
+  })
+
+  if (typeof cb !== 'function') return result
+
+  result.then((val) => cb(null, val)).catch((err) => cb(err, null))
 }
 
 module.exports = {
