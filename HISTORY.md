@@ -1,3 +1,7 @@
+# 6.0.1 (2023-12-28)
+
+  * Apply `npm audit fix` for dev deps
+
 # 6.0.0 (2023-12-28)
 
   * @lchenay: Add ttl support on memcached store to allow background refresh (#24)
