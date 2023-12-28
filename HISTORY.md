@@ -1,4 +1,9 @@
-# 4.1.0 (2023-07-25)
+# 6.0.0 (2023-12-28)
+
+  * @lchenay: Add ttl support on memcached store to allow background refresh (#24)
+  * @lchenay: Add unit tests for `mget` `mset` `mdel` functions
+
+# 5.0.0 (2023-07-25)
  
   * @radiorz: feat: add `mget` `mset` `mdel` function
 
